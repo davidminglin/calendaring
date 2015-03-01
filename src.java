@@ -10,8 +10,8 @@ public class src {
 		
 		
 		
-		// Classification	(3.8.1.3).	Note	this	is	a	way	of	users	designating	events	as	
-		// public	(default),	private,	or	confidential.
+		// Classification (3.8.1.3). Note this	is a way of users designating events	as	
+		// public (default), private, or confidential.
 		// EX: CLASS:PUBLIC
 		
 		
@@ -19,7 +19,7 @@ public class src {
 		// Location	(3.8.1.7)
 		// EX: LOCATION:Conference Room - F123\, Bldg. 002
 		// EX2: LOCATION;ALTREP="http://xyzcorp.com/conf-rooms/f123.vcf":
-        // 		Conference Room - F123\, Bldg. 002
+        	// 	Conference Room - F123\, Bldg. 002
 		
 		
 		
@@ -42,8 +42,8 @@ public class src {
 		// EX2: DTEND;VALUE=DATE:19980704
 		
 		
-		// Time	zone	identifier	(3.8.3.1,	and	whatever	other	sections	you	need	to	be	
-		//		able	to	specify	time	zones)
+		// Time	zone identifier	(3.8.3.1, and whatever other sections you need to be	
+		//	able to specify time zones)
 		// EX: TZID:/example.org/America/New_York
 	}
 
