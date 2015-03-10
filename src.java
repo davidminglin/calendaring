@@ -23,10 +23,13 @@ public class src {
 		String beginEvent = "BEGIN:VEVENT\n";
 		String endEvent = "END:VEVENT\n";
 		String classification = null;
+		String priority = null;
+		String summary = null;
 		boolean badInput = true;
 		
-		System.out.println("Calendar\n");
-		System.out.println("Enter Number Option:");
+		System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
+		System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
+		System.out.println("Please enter the number of your choice:");
 		System.out.println("1) Create New Calendar");
 		System.out.println("2) Use Existing Calendar");
 		System.out.println("0) Quit");
@@ -48,13 +51,13 @@ public class src {
 				case '2': 
 					badInput = false;
 					do {
-						System.out.println("Enter File Path of Existing Calendar File:");
+						System.out.println("Please enter the file path of an existing calendar file:");
 						filepath = keyboard.nextLine();
 						file = new File(filepath);
 						if(file.exists()) {
 							break;
 						}
-						else System.out.println("Bad File Path");
+						else System.out.println("Sorry, the path you entered is invalid.");
 					}
 					while(!file.exists());
 					
@@ -110,7 +113,7 @@ public class src {
 		// EX: CLASS:PUBLIC
 		badInput = true;
 		do {
-			System.out.println("Enter Number Option for Classification:");
+			System.out.println("Please enter a number corresponding to how you'd like to classify your event:");
 			System.out.println("1) Public");
 			System.out.println("2) Private");
 			System.out.println("3) Confidential");
@@ -161,12 +164,61 @@ public class src {
 
 		// Priority (3.8.1.9)
 		// EX: PRIORITY:1
+		
+		badInput = true;
+		do{
+			System.out.println("Please enter a number corresponding to the priority for this event.");
+			System.out.println("0) No Priority");
+			System.out.println("1 - 4) High Priority");
+			System.out.println("5) Medium Priority");
+			System.out.println("6 - 9) Low Priority");
+			options = keyboard.nextLine();
+			choice = options.charAt(0);
+			
+			switch(choice){
+				case '0':
+					badInput = false;
+					priority = "UNDEFINED";
+					break;
+					
+				case '1': case '2': case '3': case '4':
+					badInput = false;
+					priority = "HIGH";
+					break;
+				
+				case '5': 
+					badInput = false;
+					priority = "MEDIUM";
+					break;
+				
+				case '6': case '7': case '8': case '9':
+					badInput = false;
+					priority = "LOW";
+					break;
+				
+				default: System.out.println("Sorry, you have entered a number outside the given options.");
+					break;
+			}
+		}
+		while(badInput);
+		//Coming back to the file writing stuff later
 
 		// Summary (3.8.1.12)
 		// EX: SUMMARY:Department Party
+		
+		badInput = true;
+		
+		System.out.println("Please enter a summary for this event");
+		System.out.println("Your summary does not have to be a long one.");
+		System.out.println("For example: Department Party.");
+		summary = keyboard.nextLine();
+		
+		//Coming back to file writing stuff later
 
 		// DTSTART (3.8.2.4)
 		// EX: DTSTART:19980118T073000Z
+		
+		
 
 		// DTEND (3.8.2.2)
 		// EX: DTEND:19960401T150000Z
