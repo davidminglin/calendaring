@@ -25,7 +25,15 @@ public class src {
 		String classification = null;
 		String priority = null;
 		String summary = null;
+		String dateStart = null;
+		String dateEnd = null;
 		boolean badInput = true;
+		int startYear = 0;
+		int startMonth = 0;
+		int startDay = 0;
+		int endYear = 0;
+		int endMonth = 0;
+		int endDay = 0;
 		
 		System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
 		System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
@@ -218,11 +226,33 @@ public class src {
 		// DTSTART (3.8.2.4)
 		// EX: DTSTART:19980118T073000Z
 		
+		// Have to figure out handling input mismatch exception for each one 
+		System.out.println("Please enter the starting year for this event.");
+		startYear = keyboard.nextInt();
+		System.out.println("Please enter the starting month for this event.");
+		startMonth = keyboard.nextInt();
+		System.out.println("Please enter the starting day for this event.");
+		startDay = keyboard.nextInt();
 		
+		//Z is zulu/UTC time...might need conversion; not everyone is familiar with UTC
+		//But for now:
+		dateStart = (startYear + startMonth + startDay);
 
 		// DTEND (3.8.2.2)
 		// EX: DTEND:19960401T150000Z
 		// EX2: DTEND;VALUE=DATE:19980704
+		
+		// Also have to figure out handling input mismatch exception for each one here
+		System.out.println("Please enter the ending year for this event.");
+		endYear = keyboard.nextInt();
+		System.out.println("Please enter the ending month for this event.");
+		endMonth = keyboard.nextInt();
+		System.out.println("Please enter the ending day for this event.");
+		endDay = keyboard.nextInt();
+		
+		//Same issue with Z/UTC time as in dtstart
+		
+		dateEnd = (endYear + endMonth + endDay);
 
 		// Time zone identifier (3.8.3.1, and whatever other sections you need
 		// to be
