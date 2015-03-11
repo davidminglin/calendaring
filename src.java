@@ -23,7 +23,7 @@ public class src {
 		String beginEvent = "BEGIN:VEVENT\n";
 		String endEvent = "END:VEVENT\n";
 		String classification = null;
-		String priority = null;
+		char priority = 0;
 		String summary = null;
 		String dateStart = null;
 		String dateEnd = null;
@@ -51,6 +51,7 @@ public class src {
 				// Create New Calendar
 				case '1': 
 					badInput = false;
+					System.out.println("Created calendar.ics file.");
 					writer = new FileWriter("calendar.ics");
 					newCalendar = true;
 					break;
@@ -100,7 +101,7 @@ public class src {
 					System.exit(0);
 					break;
 					
-				default: System.out.println("Bad Input");
+				default: System.out.println("Bad Input: " + choice);
 					break;
 			}
 				
@@ -109,12 +110,7 @@ public class src {
 		
 		// Version (section 3.7.4 of RFC 5545)
 		// EX: VERSION:2.0
-		if(newCalendar) {
-			writer.write(beginCalendar);
-			writer.write(version);
-		}
 		
-		writer.write(beginEvent);
 		// Classification (3.8.1.3). Note this is a way of users designating
 		// events as public (default), private, or confidential.
 		// classvalue = "PUBLIC" / "PRIVATE" / "CONFIDENTIAL" 
@@ -150,7 +146,6 @@ public class src {
 				
 		}
 		while(badInput);
-		writer.write(classification);
 		
 		// Location (3.8.1.7)
 		// EX: LOCATION:Conference Room - F123\, Bldg. 002
@@ -158,16 +153,6 @@ public class src {
 		// Conference Room - F123\, Bldg. 002
 		System.out.println("Enter Event Location:");
 		String location = keyboard.nextLine();
-		writer.write("LOCATION:" + location + "\n");
-		
-		
-		writer.write(endEvent);
-		writer.write(endCalendar);
-		writer.close();
-	
-		
-		
-		
 		
 
 		// Priority (3.8.1.9)
@@ -176,6 +161,7 @@ public class src {
 		badInput = true;
 		do{
 			System.out.println("Please enter a number corresponding to the priority for this event.");
+			System.out.println("(First number will be used)");
 			System.out.println("0) No Priority");
 			System.out.println("1 - 4) High Priority");
 			System.out.println("5) Medium Priority");
@@ -183,30 +169,11 @@ public class src {
 			options = keyboard.nextLine();
 			choice = options.charAt(0);
 			
-			switch(choice){
-				case '0':
-					badInput = false;
-					priority = "UNDEFINED";
-					break;
-					
-				case '1': case '2': case '3': case '4':
-					badInput = false;
-					priority = "HIGH";
-					break;
-				
-				case '5': 
-					badInput = false;
-					priority = "MEDIUM";
-					break;
-				
-				case '6': case '7': case '8': case '9':
-					badInput = false;
-					priority = "LOW";
-					break;
-				
-				default: System.out.println("Sorry, you have entered a number outside the given options.");
-					break;
+			if(choice >= '0' && choice <= '9') {
+				priority = choice;
+				badInput = false;
 			}
+			else System.out.println("Bad Input: " + choice);
 		}
 		while(badInput);
 		//Coming back to the file writing stuff later
@@ -217,8 +184,8 @@ public class src {
 		badInput = true;
 		
 		System.out.println("Please enter a summary for this event");
-		System.out.println("Your summary does not have to be a long one.");
-		System.out.println("For example: Department Party.");
+		// System.out.println("Your summary does not have to be a long one.");
+		// System.out.println("For example: Department Party.");
 		summary = keyboard.nextLine();
 		
 		//Coming back to file writing stuff later
@@ -236,7 +203,7 @@ public class src {
 		
 		//Z is zulu/UTC time...might need conversion; not everyone is familiar with UTC
 		//But for now:
-		dateStart = (startYear + startMonth + startDay);
+		dateStart = (startYear + "" + startMonth + "" + startDay);
 
 		// DTEND (3.8.2.2)
 		// EX: DTEND:19960401T150000Z
@@ -252,12 +219,29 @@ public class src {
 		
 		//Same issue with Z/UTC time as in dtstart
 		
-		dateEnd = (endYear + endMonth + endDay);
+		dateEnd = (endYear + "" + endMonth + "" + endDay);
 
 		// Time zone identifier (3.8.3.1, and whatever other sections you need
 		// to be
 		// able to specify time zones)
 		// EX: TZID:/example.org/America/New_York
+		
+		
+		if(newCalendar) {
+			writer.write(beginCalendar);
+			writer.write(version);
+		}
+		
+		writer.write(beginEvent);
+		writer.write(classification);
+		writer.write("LOCATION:" + location + "\n");
+		writer.write("PRIORITY:" + priority + "\n");
+		writer.write("SUMMARY:" + summary + "\n");
+		writer.write("DTSTART:" + dateStart + "\n");
+		writer.write("DTEND:" + dateEnd + "\n");
+		writer.write(endEvent);
+		writer.write(endCalendar);
+		writer.close();
 	}
 
 }
