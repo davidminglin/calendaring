@@ -27,6 +27,8 @@ public class src {
 		String summary = null;
 		String dateStart = null;
 		String dateEnd = null;
+		int timeStart = 0;
+		int timeEnd = 0;
 		boolean badInput = true;
 		int startYear = 0;
 		int startMonth = 0;
@@ -166,7 +168,7 @@ public class src {
 			badInput = true;
 			do{
 				System.out.println("Please enter a number corresponding to the priority for this event.");
-				System.out.println("(First number will be used)");
+				System.out.println("(First digit will be used)");
 				System.out.println("0) No Priority");
 				System.out.println("1 - 4) High Priority");
 				System.out.println("5) Medium Priority");
@@ -205,10 +207,12 @@ public class src {
 			startMonth = keyboard.nextInt();
 			System.out.println("Please enter the starting day for this event.");
 			startDay = keyboard.nextInt();
+			System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
+			timeStart = keyboard.nextInt();
 
 			//Z is zulu/UTC time...might need conversion; not everyone is familiar with UTC
 			//But for now:
-			dateStart = (startYear + "" + startMonth + "" + startDay);
+
 
 			// DTEND (3.8.2.2)
 			// EX: DTEND:19960401T150000Z
@@ -221,10 +225,38 @@ public class src {
 			endMonth = keyboard.nextInt();
 			System.out.println("Please enter the ending day for this event.");
 			endDay = keyboard.nextInt();
-
+			System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
+			timeEnd = keyboard.nextInt();
 			//Same issue with Z/UTC time as in dtstart
 
-			dateEnd = (endYear + "" + endMonth + "" + endDay);
+			// Checks if the event ends before it begins
+			// On different days
+			while ((startYear > endYear) || ((startYear == endYear) && (startMonth == endMonth) && (startDay > endDay)) || ((startYear == endYear) && (startMonth > endMonth))) {
+				System.out.println("The event begins after it ends?");
+				System.out.println("Please enter the starting year for this event.");
+				startYear = keyboard.nextInt();
+				System.out.println("Please enter the starting month for this event.");
+				startMonth = keyboard.nextInt();
+				System.out.println("Please enter the starting day for this event.");
+				startDay = keyboard.nextInt();
+				System.out.println("Please enter the ending year for this event.");
+				endYear = keyboard.nextInt();
+				System.out.println("Please enter the ending month for this event.");
+				endMonth = keyboard.nextInt();
+				System.out.println("Please enter the ending day for this event.");
+				endDay = keyboard.nextInt();
+			}
+			// On the same date
+			while ((timeEnd < timeStart) && (startYear == endYear) && (startMonth == endMonth) && (startDay == endDay)) {
+				System.out.println("The event ends before it begins?");
+				System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
+				timeStart = keyboard.nextInt();
+				System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
+				timeEnd = keyboard.nextInt();
+			}
+
+			dateStart = (startYear + "" + startMonth + "" + startDay + "T" + timeStart);
+			dateEnd = (endYear + "" + endMonth + "" + endDay + "T" + timeEnd);
 
 			// Time zone identifier (3.8.3.1, and whatever other sections you need
 			// to be
@@ -247,6 +279,7 @@ public class src {
 			writer.write(endEvent);
 			writer.write(endCalendar);
 			writer.close();
-		}while(isOn);
+		}
+		while(isOn);
 	}
 }
