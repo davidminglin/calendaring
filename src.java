@@ -51,8 +51,10 @@ public class src {
 				// Create New Calendar
 				case '1': 
 					badInput = false;
-					System.out.println("Created calendar.ics file.");
-					writer = new FileWriter("calendar.ics");
+					System.out.println("Name the calender");
+					String name = keyboard.nextLine();
+					System.out.println("Created " + name + ".ics file.");
+					writer = new FileWriter(name + ".ics");
 					newCalendar = true;
 					break;
 					
