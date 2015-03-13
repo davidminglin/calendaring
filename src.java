@@ -31,22 +31,23 @@ public class src {
 		String dateStart = null;
 		String dateEnd = null;
 		String tzid = null;
-		int timeStart = 0;
-		int timeEnd = 0;
+		String timeStart = null;
+		String timeEnd = null;
 		boolean badInput = true;
-		int startYear = 0;
-		int startMonth = 0;
-		int startDay = 0;
-		int endYear = 0;
-		int endMonth = 0;
-		int endDay = 0;
+		String startYear = null;
+		String startMonth = null;
+		String startDay = null;
+		String endYear;
+		String endMonth;
+		String endDay = null;
 		boolean isOn = true;
 		Date date = new Date();
 		boolean badDate = true;
 		String possibleDate = null;
 		boolean allDay = false;
 		boolean empty;
-
+		int check = 0;
+		
 		System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
 		System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
 		do {
@@ -252,44 +253,52 @@ public class src {
 				try {
 					badInput = true;
 					do {
-						System.out.println("Please enter the starting month for this event.");
+						System.out.println("Please enter the starting month for this event.\nMM");
 						empty = true;
 						do {
-							options = keyboard.nextLine();
-							if(!options.isEmpty()) empty = false;
+							startMonth = keyboard.nextLine();
+							if(!startMonth.isEmpty()) empty = false;
 						}
 						while(empty);
-						if(!options.isEmpty()) badInput = false;
-						startMonth = Integer.parseInt(options);
-						possibleDate = possibleDate + startMonth;
+						if(startMonth.length() == 2) {
+							badInput = false;
+							check = Integer.parseInt(options);
+							possibleDate = possibleDate + startMonth;
+						}
 					}
 					while(badInput);
 					
+					badInput = true;
 					do {
-						System.out.println("Please enter the starting day for this event.");
+						System.out.println("Please enter the starting day for this event.\ndd");
 						empty = true;
 						do {
-							options = keyboard.nextLine();
-							if(!options.isEmpty()) empty = false;
+							startDay = keyboard.nextLine();
+							if(!startDay.isEmpty()) empty = false;
 						}
 						while(empty);
-						if(!options.isEmpty()) badInput = false;
-						startDay = Integer.parseInt(options);
-						possibleDate = possibleDate + "/" + startDay;
+						if(startDay.length() == 2) {
+							badInput = false;
+							check = Integer.parseInt(options);
+							possibleDate = possibleDate + "/" + startDay;
+						}
 					}
 					while(badInput);
 					
+					badInput = true;
 					do {
-						System.out.println("Please enter the starting year for this event.");
+						System.out.println("Please enter the starting year for this event.\nyyyy");
 						empty = true;
 						do {
-							options = keyboard.nextLine();
+							startYear = keyboard.nextLine();
 							if(!options.isEmpty()) empty = false;
 						}
 						while(empty);
-						if(!options.isEmpty()) badInput = false;
-						startYear = Integer.parseInt(options);
-						possibleDate = possibleDate + "/" + startYear;
+						if(startYear.length() == 4) {
+							badInput = false;
+							check = Integer.parseInt(options);
+							possibleDate = possibleDate + "/" + startYear;
+						}
 					}
 					while(badInput);
 					
@@ -308,6 +317,7 @@ public class src {
 				System.out.println("Please enter a number corresponding to event duration");
 				System.out.println("1) All day");
 				System.out.println("2) Duration");
+				
 				empty = true;
 				do {
 					options = keyboard.nextLine();
@@ -324,6 +334,7 @@ public class src {
 					
 				case '2': 
 					badInput = false;
+					allDay = false;
 
 					break;
 				default: System.out.println("Bad Input");
@@ -343,19 +354,36 @@ public class src {
 			endYear = startYear;
 			endMonth = startMonth;
 			if(allDay) {
-				endDay = startDay + 1;
+				int dayEnd = Integer.parseInt(startDay) + 1;
+				if(dayEnd < 10) {
+					endDay = "0" + dayEnd;
+				}
+				else endDay = "" + dayEnd;
+;				
 			}
 			else {
 				badInput = true;
 				do {
-					System.out.println("Please enter the ending day for this event.");
+					System.out.println("Please enter the ending day for this event.\ndd");
 					try {
-						endDay = keyboard.nextInt();
+						empty = true;
+						do {
+							endDay = keyboard.nextLine();
+							if(!endDay.isEmpty()) empty = false;
+						}
+						while(empty);
+						if(endDay.length() == 2) {
+							if(Integer.parseInt(endDay) < Integer.parseInt(startDay)) {
+								System.out.println("Error: Ending before starting");
+							}
+							else {
+								badInput = false;
+								check = Integer.parseInt(endDay);
+							}
+						}
 					} catch (Exception e) {
 					    System.out.println("Error: Not a number!");
 					}
-					if(endDay < startDay) System.out.println("Error: Ending before starting");
-					else badInput = false;
 				}
 				while(badInput);
 				
@@ -365,12 +393,15 @@ public class src {
 					System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
 					System.out.println("Example: 083000");
 					try {
-						options = keyboard.nextLine();
-						if(timeExists(options)) {
-							badInput = false;
-							timeStart = Integer.parseInt(options);
+						empty = true;
+						do {
+							timeStart = keyboard.nextLine();
+							if(!timeStart.isEmpty()) empty = false;
 						}
-						else System.out.println("Invalid Time: " + options);
+						while(empty);
+						if(timeStart.length() == 6) {
+							badInput = !timeExists(timeStart);
+						}
 							
 					} catch (Exception e) {
 					    System.out.println("Error: Not a number!");
@@ -384,16 +415,18 @@ public class src {
 					System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
 					System.out.println("Example: 093000");
 					try {
-						options = keyboard.nextLine();
-						if(timeExists(options)) {
-							badInput = false;
-							timeEnd = Integer.parseInt(options);
-							if(timeEnd < timeStart) {
-								badInput = true;
-								System.out.println("Error: Time ending before starting: " + options);
-							}
+						empty = true;
+						do {
+							timeEnd = keyboard.nextLine();
+							if(!timeEnd.isEmpty()) empty = false;
 						}
-						else System.out.println("Invalid Time: " + options);
+						while(empty);
+						if(timeEnd.length() == 6) {
+							if(Integer.parseInt(timeEnd) > Integer.parseInt(timeStart)) {
+								badInput = !timeExists(timeEnd);
+							}
+							else System.out.println("Error: Ending before starting");
+						}
 							
 					} catch (Exception e) {
 					    System.out.println("Error: Not a number!");
@@ -413,9 +446,9 @@ public class src {
 			
 
 			// Time zone identifier (3.8.3.1, and whatever other sections you need
-			// to be
-			// able to specify time zones)
-			// EX: TZID:/example.org/America/New_York
+			// to be able to specify time zones)
+			// EX: TZID:America/New_York
+			System.out.println("Enter Time zone identifier");
 			badInput = true;
 			do{
 				System.out.println("todo");
@@ -425,13 +458,9 @@ public class src {
 					if(!options.isEmpty()) empty = false;
 				}
 				while(empty);
-				choice = options.charAt(0);
-
-				if(choice >= '0' && choice <= '9') {
-					priority = choice;
-					badInput = false;
-				}
-				else System.out.println("Bad Input: " + choice);
+				
+				tzid = "America/Hawaii";
+				badInput = false;
 			}
 			while(badInput);
 
@@ -447,6 +476,7 @@ public class src {
 			writer.write("SUMMARY:" + summary + "\n");
 			writer.write("DTSTART:" + dateStart + "\n");
 			writer.write("DTEND:" + dateEnd + "\n");
+			writer.write("TZID:" + tzid + "\n");
 			writer.write(endEvent);
 			writer.write(endCalendar);
 			writer.close();
