@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class src {
 	
@@ -448,21 +449,8 @@ public class src {
 			// Time zone identifier (3.8.3.1, and whatever other sections you need
 			// to be able to specify time zones)
 			// EX: TZID:America/New_York
-			System.out.println("Enter Time zone identifier");
-			badInput = true;
-			do{
-				System.out.println("todo");
-				empty = true;
-				do {
-					options = keyboard.nextLine();
-					if(!options.isEmpty()) empty = false;
-				}
-				while(empty);
-				
-				tzid = "America/Hawaii";
-				badInput = false;
-			}
-			while(badInput);
+			TimeZone timeZone = TimeZone.getDefault();
+			tzid = timeZone.getID();
 
 			if(newCalendar) {
 				writer.write(beginCalendar);
