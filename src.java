@@ -6,10 +6,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
+import java.util.Date;
 
 public class src {
-
+	
 	public static void main(String[] args) throws IOException {
 		FileWriter writer = null;
 		File file = null;
@@ -27,6 +30,7 @@ public class src {
 		String summary = null;
 		String dateStart = null;
 		String dateEnd = null;
+		String tzid = null;
 		int timeStart = 0;
 		int timeEnd = 0;
 		boolean badInput = true;
@@ -37,10 +41,15 @@ public class src {
 		int endMonth = 0;
 		int endDay = 0;
 		boolean isOn = true;
+		Date date = new Date();
+		boolean badDate = true;
+		String possibleDate = null;
+		boolean allDay = false;
+		boolean empty;
 
+		System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
+		System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
 		do {
-			System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
-			System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
 			System.out.println("Please enter the number of your choice:");
 			System.out.println("1) Create New Calendar");
 			System.out.println("2) Use Existing Calendar");
@@ -48,7 +57,12 @@ public class src {
 
 			Scanner keyboard = new Scanner(System.in);
 			do {
-				options = keyboard.nextLine();
+				empty = true;
+				do {
+					options = keyboard.nextLine();
+					if(!options.isEmpty()) empty = false;
+				}
+				while(empty);
 				choice = options.charAt(0);
 				switch(choice) {
 
@@ -56,7 +70,13 @@ public class src {
 				case '1': 
 					badInput = false;
 					System.out.println("Name the calender");
-					String name = keyboard.nextLine();
+					String name;
+					empty = true;
+					do {
+						name = keyboard.nextLine();
+						if(!name.isEmpty()) empty = false;
+					}
+					while(empty);
 					System.out.println("Created " + name + ".ics file.");
 					writer = new FileWriter(name + ".ics");
 					newCalendar = true;
@@ -67,7 +87,12 @@ public class src {
 					badInput = false;
 					do {
 						System.out.println("Please enter the file path of an existing calendar file:");
-						filepath = keyboard.nextLine();
+						empty = true;
+						do {
+							filepath = keyboard.nextLine();
+							if(!filepath.isEmpty()) empty = false;
+						}
+						while(empty);
 						file = new File(filepath);
 						if(file.exists()) {
 							break;
@@ -128,7 +153,12 @@ public class src {
 				System.out.println("1) Public");
 				System.out.println("2) Private");
 				System.out.println("3) Confidential");
-				options = keyboard.nextLine();
+				empty = true;
+				do {
+					options = keyboard.nextLine();
+					if(!options.isEmpty()) empty = false;
+				}
+				while(empty);
 				choice = options.charAt(0);
 				switch(choice) {
 				case '1': 
@@ -159,7 +189,13 @@ public class src {
 			// EX2: LOCATION;ALTREP="http://xyzcorp.com/conf-rooms/f123.vcf":
 			// Conference Room - F123\, Bldg. 002
 			System.out.println("Enter Event Location:");
-			String location = keyboard.nextLine();
+			String location;
+			empty = true;
+			do {
+				location = keyboard.nextLine();
+				if(!location.isEmpty()) empty = false;
+			}
+			while(empty);
 
 
 			// Priority (3.8.1.9)
@@ -173,7 +209,12 @@ public class src {
 				System.out.println("1 - 4) High Priority");
 				System.out.println("5) Medium Priority");
 				System.out.println("6 - 9) Low Priority");
-				options = keyboard.nextLine();
+				empty = true;
+				do {
+					options = keyboard.nextLine();
+					if(!options.isEmpty()) empty = false;
+				}
+				while(empty);
 				choice = options.charAt(0);
 
 				if(choice >= '0' && choice <= '9') {
@@ -189,80 +230,210 @@ public class src {
 			// EX: SUMMARY:Department Party
 
 			badInput = true;
-
-			System.out.println("Please enter a summary for this event");
-			// System.out.println("Your summary does not have to be a long one.");
-			// System.out.println("For example: Department Party.");
-			summary = keyboard.nextLine();
+			do{
+				System.out.println("Please enter a summary for this event");
+				// System.out.println("Your summary does not have to be a long one.");
+				// System.out.println("For example: Department Party.");
+				summary = keyboard.nextLine();
+				if(summary.isEmpty()) {
+					System.out.println("Error: Summary is Empty");
+				}
+				else badInput = false;
+			}
+			while(badInput);
 
 			//Coming back to file writing stuff later
 
 			// DTSTART (3.8.2.4)
 			// EX: DTSTART:19980118T073000Z
+			
+			do {
+				possibleDate = "";
+				try {
+					badInput = true;
+					do {
+						System.out.println("Please enter the starting month for this event.");
+						empty = true;
+						do {
+							options = keyboard.nextLine();
+							if(!options.isEmpty()) empty = false;
+						}
+						while(empty);
+						if(!options.isEmpty()) badInput = false;
+						startMonth = Integer.parseInt(options);
+						possibleDate = possibleDate + startMonth;
+					}
+					while(badInput);
+					
+					do {
+						System.out.println("Please enter the starting day for this event.");
+						empty = true;
+						do {
+							options = keyboard.nextLine();
+							if(!options.isEmpty()) empty = false;
+						}
+						while(empty);
+						if(!options.isEmpty()) badInput = false;
+						startDay = Integer.parseInt(options);
+						possibleDate = possibleDate + "/" + startDay;
+					}
+					while(badInput);
+					
+					do {
+						System.out.println("Please enter the starting year for this event.");
+						empty = true;
+						do {
+							options = keyboard.nextLine();
+							if(!options.isEmpty()) empty = false;
+						}
+						while(empty);
+						if(!options.isEmpty()) badInput = false;
+						startYear = Integer.parseInt(options);
+						possibleDate = possibleDate + "/" + startYear;
+					}
+					while(badInput);
+					
+					if(dateExists(possibleDate)) {
+						badDate = false;
+					}
+					else System.out.println("Invalid Date: " + possibleDate);
+				} catch (Exception e) {
+				    System.out.println("Error: Not a number!");
+				}
+			}
+			while(badDate);
+			
+			badInput = true;
+			do {
+				System.out.println("Please enter a number corresponding to event duration");
+				System.out.println("1) All day");
+				System.out.println("2) Duration");
+				empty = true;
+				do {
+					options = keyboard.nextLine();
+					if(!options.isEmpty()) empty = false;
+				}
+				while(empty);
+				choice = options.charAt(0);
+				switch(choice) {
+				case '1': 
+					badInput = false;
+					allDay = true;
 
-			// Have to figure out handling input mismatch exception for each one 
-			System.out.println("Please enter the starting year for this event.");
-			startYear = keyboard.nextInt();
-			System.out.println("Please enter the starting month for this event.");
-			startMonth = keyboard.nextInt();
-			System.out.println("Please enter the starting day for this event.");
-			startDay = keyboard.nextInt();
-			System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
-			timeStart = keyboard.nextInt();
+					break;
+					
+				case '2': 
+					badInput = false;
 
+					break;
+				default: System.out.println("Bad Input");
+					break;
+				}
+
+			}
+			while(badInput);
+			
 			//Z is zulu/UTC time...might need conversion; not everyone is familiar with UTC
 			//But for now:
-
 
 			// DTEND (3.8.2.2)
 			// EX: DTEND:19960401T150000Z
 			// EX2: DTEND;VALUE=DATE:19980704
-
-			// Also have to figure out handling input mismatch exception for each one here
-			System.out.println("Please enter the ending year for this event.");
-			endYear = keyboard.nextInt();
-			System.out.println("Please enter the ending month for this event.");
-			endMonth = keyboard.nextInt();
-			System.out.println("Please enter the ending day for this event.");
-			endDay = keyboard.nextInt();
-			System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
-			timeEnd = keyboard.nextInt();
-			//Same issue with Z/UTC time as in dtstart
-
-			// Checks if the event ends before it begins
-			// On different days
-			while ((startYear > endYear) || ((startYear == endYear) && (startMonth == endMonth) && (startDay > endDay)) || ((startYear == endYear) && (startMonth > endMonth))) {
-				System.out.println("The event begins after it ends?");
-				System.out.println("Please enter the starting year for this event.");
-				startYear = keyboard.nextInt();
-				System.out.println("Please enter the starting month for this event.");
-				startMonth = keyboard.nextInt();
-				System.out.println("Please enter the starting day for this event.");
-				startDay = keyboard.nextInt();
-				System.out.println("Please enter the ending year for this event.");
-				endYear = keyboard.nextInt();
-				System.out.println("Please enter the ending month for this event.");
-				endMonth = keyboard.nextInt();
-				System.out.println("Please enter the ending day for this event.");
-				endDay = keyboard.nextInt();
+			
+			endYear = startYear;
+			endMonth = startMonth;
+			if(allDay) {
+				endDay = startDay + 1;
 			}
-			// On the same date
-			while ((timeEnd < timeStart) && (startYear == endYear) && (startMonth == endMonth) && (startDay == endDay)) {
-				System.out.println("The event ends before it begins?");
-				System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
-				timeStart = keyboard.nextInt();
-				System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
-				timeEnd = keyboard.nextInt();
+			else {
+				badInput = true;
+				do {
+					System.out.println("Please enter the ending day for this event.");
+					try {
+						endDay = keyboard.nextInt();
+					} catch (Exception e) {
+					    System.out.println("Error: Not a number!");
+					}
+					if(endDay < startDay) System.out.println("Error: Ending before starting");
+					else badInput = false;
+				}
+				while(badInput);
+				
+				// Get starting time
+				badInput = true;
+				do {
+					System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
+					System.out.println("Example: 083000");
+					try {
+						options = keyboard.nextLine();
+						if(timeExists(options)) {
+							badInput = false;
+							timeStart = Integer.parseInt(options);
+						}
+						else System.out.println("Invalid Time: " + options);
+							
+					} catch (Exception e) {
+					    System.out.println("Error: Not a number!");
+					}
+				}
+				while(badInput);
+				
+				// Get ending time
+				badInput = true;
+				do {
+					System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
+					System.out.println("Example: 093000");
+					try {
+						options = keyboard.nextLine();
+						if(timeExists(options)) {
+							badInput = false;
+							timeEnd = Integer.parseInt(options);
+							if(timeEnd < timeStart) {
+								badInput = true;
+								System.out.println("Error: Time ending before starting: " + options);
+							}
+						}
+						else System.out.println("Invalid Time: " + options);
+							
+					} catch (Exception e) {
+					    System.out.println("Error: Not a number!");
+					}
+				}
+				while(badInput);
 			}
-
-			dateStart = (startYear + "" + startMonth + "" + startDay + "T" + timeStart);
-			dateEnd = (endYear + "" + endMonth + "" + endDay + "T" + timeEnd);
+			
+			if(allDay) {
+				dateStart = startYear + "" + startMonth + "" + startDay;
+				dateEnd = endYear + "" + endMonth + "" + endDay;
+			}
+			else {
+				dateStart = startYear + "" + startMonth + "" + startDay + "T" + timeStart + "Z";
+				dateEnd = endYear + "" + endMonth + "" + endDay + "T" + timeEnd + "Z";
+			}
+			
 
 			// Time zone identifier (3.8.3.1, and whatever other sections you need
 			// to be
 			// able to specify time zones)
 			// EX: TZID:/example.org/America/New_York
+			badInput = true;
+			do{
+				System.out.println("todo");
+				empty = true;
+				do {
+					options = keyboard.nextLine();
+					if(!options.isEmpty()) empty = false;
+				}
+				while(empty);
+				choice = options.charAt(0);
 
+				if(choice >= '0' && choice <= '9') {
+					priority = choice;
+					badInput = false;
+				}
+				else System.out.println("Bad Input: " + choice);
+			}
+			while(badInput);
 
 			if(newCalendar) {
 				writer.write(beginCalendar);
@@ -281,5 +452,41 @@ public class src {
 			writer.close();
 		}
 		while(isOn);
+	}
+	
+	/**
+	 * Reference: http://stackoverflow.com/questions/4516572/checking-if-a-date-exists-or-not
+	 * @author user467871
+	 */
+	private static boolean dateExists(String date) {
+        String formatString = "MM/dd/yyyy";
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat(formatString);
+            format.setLenient(false);
+            format.parse(date);
+        } catch (ParseException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+
+        return true;
+    }
+	
+	private static boolean timeExists(String time) {
+		String formatString = "HHmmss";
+		
+		try {
+            SimpleDateFormat format = new SimpleDateFormat(formatString);
+            format.setLenient(false);
+            format.parse(time);
+        } catch (ParseException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+
+        return true;
 	}
 }
