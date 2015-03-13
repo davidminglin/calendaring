@@ -440,8 +440,8 @@ public class src {
 				dateEnd = endYear + "" + endMonth + "" + endDay;
 			}
 			else {
-				dateStart = startYear + "" + startMonth + "" + startDay + "T" + timeStart + "Z";
-				dateEnd = endYear + "" + endMonth + "" + endDay + "T" + timeEnd + "Z";
+				dateStart = startYear + "" + startMonth + "" + startDay + "T" + timeStart;
+				dateEnd = endYear + "" + endMonth + "" + endDay + "T" + timeEnd;
 			}
 			
 
