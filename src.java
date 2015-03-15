@@ -51,6 +51,7 @@ public class src {
 		
 		System.out.println("Welcome to ICS 314, Spring 2015, iCal Calendaring Project");
 		System.out.println("You may choose to create a new calendar file, or edit an existing file.\n");
+		System.out.println("If you wish to do neither, you may exit the program.");
 		do {
 			System.out.println("Please enter the number of your choice:");
 			System.out.println("1) Create New Calendar");
@@ -131,7 +132,8 @@ public class src {
 
 				case '0': 
 					isOn = false;
-					System.out.println("Closed");
+					System.out.println("Thanks for running this calendar file editor/maker!");
+					System.out.println("Now exiting.");
 					System.exit(0);
 					break;
 
@@ -345,8 +347,6 @@ public class src {
 			}
 			while(badInput);
 			
-			//Z is zulu/UTC time...might need conversion; not everyone is familiar with UTC
-			//But for now:
 
 			// DTEND (3.8.2.2)
 			// EX: DTEND:19960401T150000Z
@@ -423,7 +423,7 @@ public class src {
 						}
 						while(empty);
 						if(timeEnd.length() == 6) {
-							if(Integer.parseInt(timeEnd) > Integer.parseInt(timeStart)) {
+							if((Integer.parseInt(timeEnd) > Integer.parseInt(timeStart)) || (Integer.parseInt(endDay) > Integer.parseInt(startDay))) {
 								badInput = !timeExists(timeEnd);
 							}
 							else System.out.println("Error: Ending before starting");
