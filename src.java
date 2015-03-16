@@ -266,7 +266,7 @@ public class src {
 							badDate = false;
 						} else
 							System.out.println("Invalid Date: " + possibleDate);
-					} catch (Exception e) {
+					} catch (NumberFormatException e) {
 						System.out.println("Error: Not a number!");
 					}
 				} while (badDate);
@@ -334,8 +334,10 @@ public class src {
 								System.out.println("Please enter the ending day for this event.\ndd");
 								endDay = getLine();
 								if (endDay.length() == 2) {
-									badInput = false;
 									check = Integer.parseInt(endDay);
+									if(check < Integer.parseInt(startDay) && Integer.parseInt(startMonth) == Integer.parseInt(endMonth)) {
+										System.out.println("Error: Ending before starting");
+									} else badInput = false;
 									possibleDate = possibleDate + "/" + endDay;
 								}
 							} while (badInput);
@@ -345,7 +347,7 @@ public class src {
 								badDate = false;
 							} else
 								System.out.println("Invalid Date: " + possibleDate);
-						} catch (Exception e) {
+						} catch (NumberFormatException e) {
 							System.out.println("Error: Not a number!");
 						}
 					} while (badDate);
@@ -353,23 +355,20 @@ public class src {
 					// Get starting time
 					badInput = true;
 					do {
-						System.out
-						.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
-						System.out.println("Example 8:30 AM: 083000");
+						timeEnd = null;
+						System.out.println("Please enter the starting time [in a 24 hour clock format (hhmmss)] for this event.");
+						System.out.println("Example 1:00 PM: 130000");
 						try {
 							timeStart = getLine();
+							check = Integer.parseInt(timeStart);
 							if (timeStart.length() == 6) {
 								if (timeExists(timeStart)) {
 									badInput = false;
 								} else
 									System.out.println("Error: Invalid Time!");
 							}
-							if(timeEnd.length() == 6) {
-								if((Integer.parseInt(timeEnd) > Integer.parseInt(timeStart)) || (Integer.parseInt(endDay) > Integer.parseInt(startDay))) {
-									badInput = !timeExists(timeEnd);
-								}
-							}
-						} catch (Exception e) {
+
+						} catch (NumberFormatException e) {
 							System.out.println("Error: Not a number!");
 						}
 					} while (badInput);
@@ -377,11 +376,12 @@ public class src {
 					// Get ending time
 					badInput = true;
 					do {
-						System.out
-						.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
+						timeEnd = null;
+						System.out.println("Please enter the ending time [in a 24 hour clock format (hhmmss)] for this event.");
 						System.out.println("Example 1:30 PM: 133000");
 						try {
 							timeEnd = getLine();
+							check = Integer.parseInt(timeEnd);
 							if (timeEnd.length() == 6) {
 								if ((Integer.parseInt(timeEnd) > Integer.parseInt(timeStart)) || (Integer.parseInt(endDay) > Integer.parseInt(startDay))) {
 									if (timeExists(timeEnd)) {
@@ -392,7 +392,7 @@ public class src {
 									System.out.println("Error: Ending before starting");
 							}
 
-						} catch (Exception e) {
+						} catch (NumberFormatException e) {
 							System.out.println("Error: Not a number!");
 						}
 					} while (badInput);
@@ -433,6 +433,12 @@ public class src {
 				break;
 
 			case '2':
+				/**
+				 * The input is a list of .ics filenames (pathnames, if necessary) 
+				 * that describe events all on the same date and in the same time zone. 
+				 * The output is .ics files describing free times between the inputted events. 
+				 * The Summary field of the output .ics files shall be “Free Time”.
+				 */
 				System.out.println("to do");
 				break;
 
@@ -452,6 +458,14 @@ public class src {
 		} while (isOn);
 	}
 
+	// to dos
+	
+	public int getTime(String line) {
+		return 0;
+	}
+	
+	// Make some other methods
+	
 	public static char getChar() {
 		empty = true;
 		do {
