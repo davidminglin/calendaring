@@ -5,7 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class srcTest {
-
+	src s = new src();
+	
 	@Test
 	public void testGetTime() {
 		fail("Not yet implemented");
@@ -13,11 +14,13 @@ public class srcTest {
 	
 	@Test
 	public void testDateExists() {
-		fail("Not yet implemented");
+		assertTrue(s.dateExists("01/20/2015"));
+		assertFalse(s.dateExists("00/33/2015"));
+		assertFalse(s.dateExists("00/33/0000"));
 	}
 	
 	@Test
 	public void testTimeExists() {
-		fail("Not yet implemented");
+		assertFalse(s.timeExists("137000"));
 	}
 }

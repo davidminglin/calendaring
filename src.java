@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.PatternSyntaxException;
 
 public class src {
 	static FileWriter writer = null;
@@ -54,8 +55,8 @@ public class src {
 		do {
 			System.out.println("Please enter the number of your choice:");
 			System.out.println("1) Create/Modify Calendar");
-			System.out.println("2) Free Time");
-			System.out.println("3) Meeting Time");
+			System.out.println("2) Create Free Time Calendar");
+			System.out.println("3) Create Meeting Time Calendar");
 			System.out.println("0) Quit");
 			start = getChar();
 			switch (start) {
@@ -439,7 +440,19 @@ public class src {
 				 * The output is .ics files describing free times between the inputted events. 
 				 * The Summary field of the output .ics files shall be “Free Time”.
 				 */
-				System.out.println("to do");
+				String[] files;
+				do {
+					System.out.println("Enter list of .ics files or pathnames for freeTime.ics creation");
+					System.out.println("Ex: event.ics");
+					System.out.println("(Events must be on same date and same time zone)");
+					options = getLine();
+					files = options.split("\\s+");
+					assert(files.length != 0);
+				}
+				while(badFiles(files));
+				
+				readFiles(files);
+				
 				break;
 
 			case '3':
@@ -460,8 +473,42 @@ public class src {
 
 	// to dos
 	
-	public int getTime(String line) {
-		return 0;
+	public static void readFiles(String[] files) {
+		for(int x = 0; x < files.length; x++) {
+			filepath = files[x];
+			file = new File(filepath);
+			try {
+				BufferedReader bReader = new BufferedReader(new FileReader(file));
+				String line;
+				while ((line = bReader.readLine()) != null) {
+					System.out.println(line);
+				}
+				bReader.close();
+			}
+			catch (Exception e) {
+				e.getMessage();
+			}
+			
+		}
+		
+		
+	}
+	
+	public static boolean badFiles(String[] files) {
+		for(int x = 0; x < files.length; x++) {
+			filepath = files[x];
+			file = new File(filepath);
+			if (!file.exists()) {
+				System.out.println("Error: Check filename or filepath.");
+				return true;
+			}	
+		}
+		return false;
+	}
+	
+	public static String getTime(String line) {
+		
+		return "";
 	}
 	
 	// Make some other methods
@@ -493,7 +540,7 @@ public class src {
 	 * 
 	 * @author user467871
 	 */
-	private static boolean dateExists(String date) {
+	public static boolean dateExists(String date) {
 		String formatString = "MM/dd/yyyy";
 
 		try {
@@ -509,7 +556,7 @@ public class src {
 		return true;
 	}
 
-	private static boolean timeExists(String time) {
+	public static boolean timeExists(String time) {
 		String formatString = "HHmmss";
 
 		try {
