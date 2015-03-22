@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Date;
 import java.util.TimeZone;
@@ -50,6 +51,8 @@ public class src {
 	static int check = 0;
 	static char start = 0;
 	static Scanner keyboard = new Scanner(System.in);
+	static ArrayList<String> times = new ArrayList<String>();
+	static String sDate = null;
 
 	public static void main(String[] args) throws IOException {
 		do {
@@ -443,7 +446,7 @@ public class src {
 				String[] files;
 				do {
 					System.out.println("Enter list of .ics files or pathnames for freeTime.ics creation");
-					System.out.println("Ex: event.ics");
+					System.out.println("Ex: event.ics event2.ics");
 					System.out.println("(Events must be on same date and same time zone)");
 					options = getLine();
 					files = options.split("\\s+");
@@ -474,26 +477,58 @@ public class src {
 	// to dos
 	
 	public static void readFiles(String[] files) {
-		for(int x = 0; x < files.length; x++) {
-			filepath = files[x];
+		// Get information from first file
+		String line;
+		try{
+			filepath = files[0];
 			file = new File(filepath);
-			try {
-				BufferedReader bReader = new BufferedReader(new FileReader(file));
-				String line;
-				while ((line = bReader.readLine()) != null) {
-					System.out.println(line);
+			BufferedReader bReader = new BufferedReader(new FileReader(file));
+			while ((line = bReader.readLine()) != null) {
+				System.out.println(line);
+				if(line.contains("DTSTART")) {
+					String[] parts = line.split(":");
+					String[] timeParts = parts[1].split("T");
+					sDate = timeParts[0];
+					String time = timeParts[1];
+					times.add(time);
 				}
+				else if(line.contains("DTEND")) {
+					String[] parts = line.split(":");
+					String[] timeParts = parts[1].split("T");
+					String time = timeParts[1];
+					times.add(time);
+				}
+				else if(line.contains("TZID")) {
+					tzid = line;
+				}
+			}
+			assert(sDate != null);
+			dateStart = sDate;
+			dateEnd = sDate;
+			bReader.close();
+			
+			// Read rest of the files
+			for(int x = 1; x < files.length; x++) {
+				filepath = files[x];
+				file = new File(filepath);
+				bReader = new BufferedReader(new FileReader(file));
+				
+				while ((line = bReader.readLine()) != null) {
+					if(line.contains("DTSTART") || line.contains("DTEND")) {
+						getTime(line);
+					}
+				}
+				assert((times.size() % 2) == 0);
 				bReader.close();
 			}
-			catch (Exception e) {
-				e.getMessage();
-			}
-			
 		}
-		
+		catch (Exception e) {
+			e.getMessage();
+		}
 		
 	}
 	
+	// Checks if input are valid files
 	public static boolean badFiles(String[] files) {
 		for(int x = 0; x < files.length; x++) {
 			filepath = files[x];
@@ -506,13 +541,17 @@ public class src {
 		return false;
 	}
 	
-	public static String getTime(String line) {
-		
-		return "";
+	// Gets the time from the dtstart/dtend and adds to the ArrayList times
+	public static void getTime(String line) {
+		String[] parts = line.split(":");
+		String[] timeParts = parts[1].split("T");
+		String day = timeParts[0];
+		assert(sDate.equals(day));
+		String time = timeParts[1];
+		times.add(time);
 	}
 	
-	// Make some other methods
-	
+	// Returns first char from keyboard
 	public static char getChar() {
 		empty = true;
 		do {
@@ -523,6 +562,7 @@ public class src {
 		return (options.charAt(0));
 	}
 
+	// Returns line from keyboard
 	public static String getLine() {
 		empty = true;
 		do {
