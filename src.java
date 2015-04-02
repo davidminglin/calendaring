@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Date;
 import java.util.TimeZone;
@@ -51,11 +52,14 @@ public class src {
 	static int check = 0;
 	static char start = 0;
 	static Scanner keyboard = new Scanner(System.in);
-	static ArrayList<String> times = new ArrayList<String>();
+	static ArrayList<String> times;
 	static String sDate = null;
+	static boolean[] free = new boolean[240000];
+	static int freeCount;
 
 	public static void main(String[] args) throws IOException {
 		do {
+			times = new ArrayList<String>();
 			System.out.println("Please enter the number of your choice:");
 			System.out.println("1) Create/Modify Calendar");
 			System.out.println("2) Create Free Time Calendar");
@@ -86,30 +90,25 @@ public class src {
 					case '2':
 						badInput = false;
 						do {
-							System.out
-							.println("Please enter the file path of an existing calendar file:");
+							System.out.println("Please enter the file path of an existing calendar file:");
 							filepath = getLine();
 							file = new File(filepath);
 							if (file.exists()) {
 								break;
 							} else
-								System.out
-								.println("Sorry, the path you entered is invalid.");
+								System.out.println("Sorry, the path you entered is invalid.");
 						} while (!file.exists());
 
 						// Removes the END:VCALENDAR
 						// Source Referenced:
 						// http://stackoverflow.com/questions/1377279/find-a-line-in-a-file-and-remove-it
 						File temp = new File("temp.ics");
-						BufferedReader bReader = new BufferedReader(
-								new FileReader(file));
-						BufferedWriter bWriter = new BufferedWriter(
-								new FileWriter(temp));
+						BufferedReader bReader = new BufferedReader(new FileReader(file));
+						BufferedWriter bWriter = new BufferedWriter(new FileWriter(temp));
 						String line;
 						while ((line = bReader.readLine()) != null) {
 							if (!line.trim().equals(endCalendar)) {
-								bWriter.write(line
-										+ System.getProperty("line.separator"));
+								bWriter.write(line + System.getProperty("line.separator"));
 							}
 						}
 						bReader.close();
@@ -455,6 +454,13 @@ public class src {
 				while(badFiles(files));
 				
 				readFiles(files);
+				assert((times.size() % 2) == 0);
+				Arrays.fill(free, true);
+				for(int x = 0; x < times.size(); x = x + 2) {
+					fillTime(Integer.parseInt(times.get(x)), Integer.parseInt(times.get(x+1)));
+				}
+				createFree();
+				System.out.println("Number of free time calendar files created: " + freeCount);
 				
 				break;
 
@@ -476,6 +482,55 @@ public class src {
 
 	// to dos
 	
+	public static void createFree() throws IOException {
+		boolean toggle = true;
+		freeCount = 0;
+			for(int x = 0; x < 240000; x++) {
+				if(free[x] == true && toggle == true) {
+					freeCount++;
+					writer = new FileWriter("free" + freeCount + ".ics");
+					writer.write(beginCalendar);
+					writer.write(version);
+					toggle = false;
+					timeStart = pad0(x);
+					writer.write(beginEvent);
+					writer.write("SUMMARY:Free Time\n");
+					writer.write("DTSTART:" + dateStart + timeStart + "\n");
+				}
+				else if (free[x] == false && toggle == false) {
+					toggle = true;
+					timeEnd = pad0(x);
+					writer.write("DTEND:" + dateEnd + timeEnd +"\n");
+					writer.write("TZID:" + tzid + "\n");
+					writer.write(endEvent);
+					writer.close();
+				}
+			}
+			if(free[239999] == true && toggle == false) {
+				writer.write("DTEND:" + dateEnd + "235959" +"\n");
+				writer.write("TZID:" + tzid + "\n");
+				writer.write(endEvent);
+			}
+			writer.write(endCalendar);
+			writer.close();
+	}
+	
+	public static String pad0(int num) {
+		int length = String.valueOf(num).length();
+		String padded = "";
+		for(int x = 0; x < (6 - length); x++) {
+			padded = padded + 0;
+		}
+		padded = padded + num;
+		return padded;
+	}
+	
+	public static void fillTime(int start, int end) {
+		for(int x = start; x < end; x++) {
+			free[x] = false;
+		}
+	}
+	
 	public static void readFiles(String[] files) {
 		// Get information from first file
 		String line;
@@ -484,7 +539,6 @@ public class src {
 			file = new File(filepath);
 			BufferedReader bReader = new BufferedReader(new FileReader(file));
 			while ((line = bReader.readLine()) != null) {
-				System.out.println(line);
 				if(line.contains("DTSTART")) {
 					String[] parts = line.split(":");
 					String[] timeParts = parts[1].split("T");
@@ -517,8 +571,10 @@ public class src {
 					if(line.contains("DTSTART") || line.contains("DTEND")) {
 						getTime(line);
 					}
+					else if(line.contains("TZID")) {
+						assert(line.equals(tzid));
+					}
 				}
-				assert((times.size() % 2) == 0);
 				bReader.close();
 			}
 		}

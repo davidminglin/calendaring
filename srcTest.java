@@ -8,8 +8,17 @@ public class srcTest {
 	src s = new src();
 	
 	@Test
+	public void testPad0() {
+		assertEquals("000005", s.pad0(5));
+		assertEquals("123456", s.pad0(123456));
+	}
+	@Test
 	public void testGetTime() {
-		fail("Not yet implemented");
+		s.getTime("DTSTART:20150508T230000");
+		s.getTime("DTEND:20150508T2359059");
+		assertTrue(s.times.size() == 2);
+		assertTrue(s.times.get(0).equals("230000"));
+		assertTrue(s.times.get(1).equals("2359059"));
 	}
 	
 	@Test
