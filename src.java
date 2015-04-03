@@ -495,23 +495,24 @@ public class src {
 					timeStart = pad0(x);
 					writer.write(beginEvent);
 					writer.write("SUMMARY:Free Time\n");
-					writer.write("DTSTART:" + dateStart + timeStart + "\n");
+					writer.write("DTSTART:" + dateStart + "T" + timeStart + "\n");
 				}
 				else if (free[x] == false && toggle == false) {
 					toggle = true;
 					timeEnd = pad0(x);
-					writer.write("DTEND:" + dateEnd + timeEnd +"\n");
+					writer.write("DTEND:" + dateEnd + "T" + timeEnd +"\n");
 					writer.write("TZID:" + tzid + "\n");
 					writer.write(endEvent);
+					writer.write(endCalendar);
 					writer.close();
 				}
 			}
 			if(free[239999] == true && toggle == false) {
-				writer.write("DTEND:" + dateEnd + "235959" +"\n");
+				writer.write("DTEND:" + dateEnd + "T" + "235959" +"\n");
 				writer.write("TZID:" + tzid + "\n");
 				writer.write(endEvent);
+				writer.write(endCalendar);
 			}
-			writer.write(endCalendar);
 			writer.close();
 	}
 	
@@ -544,13 +545,11 @@ public class src {
 					String[] timeParts = parts[1].split("T");
 					sDate = timeParts[0];
 					String time = timeParts[1];
+					assert(time.length() == 6);
 					times.add(time);
 				}
 				else if(line.contains("DTEND")) {
-					String[] parts = line.split(":");
-					String[] timeParts = parts[1].split("T");
-					String time = timeParts[1];
-					times.add(time);
+					getTime(line);
 				}
 				else if(line.contains("TZID")) {
 					tzid = line;
