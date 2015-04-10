@@ -52,14 +52,13 @@ public class src {
 	static int check = 0;
 	static char start = 0;
 	static Scanner keyboard = new Scanner(System.in);
-	static ArrayList<String> times;
+	static ArrayList<String> times = new ArrayList<String>();
 	static String sDate = null;
 	static boolean[] free = new boolean[240000];
 	static int freeCount;
 
 	public static void main(String[] args) throws IOException {
 		do {
-			times = new ArrayList<String>();
 			System.out.println("Please enter the number of your choice:");
 			System.out.println("1) Create/Modify Calendar");
 			System.out.println("2) Create Free Time Calendar");
@@ -465,7 +464,18 @@ public class src {
 				break;
 
 			case '3':
-				System.out.println("to do");
+				String[] mfiles;
+				do {
+					System.out.println("Enter two list of .ics files or pathnames for meetTime.ics creation");
+					System.out.println("Ex: event.ics event2.ics");
+					System.out.println("(Events must be on same date and same time zone)");
+					System.out.println("\nEnter first list of .ics files:");
+					options = getLine();
+					mfiles = options.split("\\s+");
+					assert(mfiles.length != 0);
+				}
+				while(badFiles(mfiles));
+				
 				break;
 
 			case '0':
