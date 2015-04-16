@@ -56,6 +56,8 @@ public class src {
 	static String sDate = null;
 	static boolean[] free = new boolean[240000];
 	static int freeCount;
+	static int meetCount;
+	static int bestIndex = 0;
 
 	public static void main(String[] args) throws IOException {
 		do {
@@ -230,8 +232,7 @@ public class src {
 					try {
 						badInput = true;
 						do {
-							System.out
-							.println("Please enter the starting month for this event.\nMM");
+							System.out.println("Please enter the starting month for this event.\nMM");
 							startMonth = getLine();
 							if (startMonth.length() == 2) {
 								badInput = false;
@@ -242,8 +243,7 @@ public class src {
 
 						badInput = true;
 						do {
-							System.out
-							.println("Please enter the starting day for this event.\ndd");
+							System.out.println("Please enter the starting day for this event.\ndd");
 							startDay = getLine();
 							if (startDay.length() == 2) {
 								badInput = false;
@@ -303,6 +303,7 @@ public class src {
 				// EX2: DTEND;VALUE=DATE:19980704
 
 				badDate = true;
+				endMonth = startMonth;
 				endYear = startYear;
 				if (allDay) {
 					int dayEnd = Integer.parseInt(startDay) + 1;
@@ -470,11 +471,24 @@ public class src {
 					System.out.println("Ex: event.ics event2.ics");
 					System.out.println("(Events must be on same date and same time zone)");
 					System.out.println("\nEnter first list of .ics files:");
-					options = getLine();
+					String tmp = getLine();
+					System.out.println("\nEnter second list of .ics files:");
+					String tmp1 = getLine();
+					options = tmp + " " + tmp1;
+					System.out.println(options);
 					mfiles = options.split("\\s+");
-					assert(mfiles.length != 0);
 				}
 				while(badFiles(mfiles));
+				assert(mfiles.length != 0);
+				readFiles(mfiles);
+				assert((times.size() % 2) == 0);
+				Arrays.fill(free, true);
+				for(int x = 0; x < times.size(); x = x + 2) {
+					fillTime(Integer.parseInt(times.get(x)), Integer.parseInt(times.get(x+1)));
+				}
+				findBestMeet(mfiles);
+				createMeet();
+				System.out.println("Number of meet time calendar files created: " + meetCount);
 				
 				break;
 
@@ -498,12 +512,13 @@ public class src {
 			for(int x = 0; x < 240000; x++) {
 				if(free[x] == true && toggle == true) {
 					freeCount++;
-					writer = new FileWriter("free" + freeCount + ".ics");
+					writer = new FileWriter("freeTime" + freeCount + ".ics");
 					writer.write(beginCalendar);
 					writer.write(version);
 					toggle = false;
 					timeStart = pad0(x);
 					writer.write(beginEvent);
+					writer.write("PRIORITY:0\n");
 					writer.write("SUMMARY:Free Time\n");
 					writer.write("DTSTART:" + dateStart + "T" + timeStart + "\n");
 				}
@@ -526,6 +541,111 @@ public class src {
 			writer.close();
 	}
 	
+	public static void createMeet() throws IOException {
+		boolean toggle = true;
+		meetCount = 0;
+			for(int x = 0; x < 240000; x++) {
+				if(free[x] == true && toggle == true) {
+					meetCount++;
+					writer = new FileWriter("meetTime" + meetCount + ".ics");
+					writer.write(beginCalendar);
+					writer.write(version);
+					toggle = false;
+					timeStart = pad0(x);
+					writer.write(beginEvent);
+					writer.write("PRIORITY:0\n");
+					if((meetCount - 1) == bestIndex) 
+						writer.write("SUMMARY:BEST POSSIBLE MEETING TIME\n");
+					else writer.write("SUMMARY:POSSIBLE MEETING TIME\n");
+					writer.write("DTSTART:" + dateStart + "T" + timeStart + "\n");
+				}
+				else if (free[x] == false && toggle == false) {
+					toggle = true;
+					timeEnd = pad0(x);
+					writer.write("DTEND:" + dateEnd + "T" + timeEnd +"\n");
+					writer.write("TZID:" + tzid + "\n");
+					writer.write(endEvent);
+					writer.write(endCalendar);
+					writer.close();
+				}
+			}
+			if(free[239999] == true && toggle == false) {
+				writer.write("DTEND:" + dateEnd + "T" + "235959" +"\n");
+				writer.write("TZID:" + tzid + "\n");
+				writer.write(endEvent);
+				writer.write(endCalendar);
+			}
+			writer.close();
+	}
+	
+	public static void findBestMeet(String[] files) {
+		boolean toggle = true;
+		ArrayList<Integer> priorities = new ArrayList<Integer>();
+		int priority = 0;
+		int filePriority = 0;
+		String starting = "000000";
+		String ending = "000000";
+			for(int x = 0; x < 240000; x++) {
+				if(free[x] == true && toggle == true) {
+					toggle = false;
+					starting = pad0(x);
+				}
+				else if (free[x] == false && toggle == false) {
+					toggle = true;
+					ending = pad0(x);
+					// Search files for priority to fit the free time
+					for(int y = 0; y < files.length; y++) {
+						priority = 0;
+						filePriority = 0;
+						String line;
+						try{
+							filepath = files[y];
+							file = new File(filepath);
+							BufferedReader bReader = new BufferedReader(new FileReader(file));
+							while ((line = bReader.readLine()) != null) {
+								if(line.contains("DTSTART") || line.contains("DTEND")) {
+									assert(line.length() > 16);
+									String[] parts = line.split(":");
+									String[] timeParts = parts[1].split("T");
+									String time = timeParts[1];
+									if(time.equals(starting) || time.equals(ending)) {
+										priority = priority + filePriority;
+									}
+								}
+								// No priority is good priority so equation priority will use 10
+								else if(line.contains("PRIORITY")) {
+									if(line.charAt(9) == ('0')) {
+										filePriority = 10;
+									}
+									else filePriority = (int)line.charAt(9);
+								}
+
+							}
+							bReader.close();
+						}
+						catch (Exception e) {
+							e.getMessage();
+						}
+					} // End loop for searching files
+					priorities.add(priority);
+				}
+			}
+			int max = 0;
+			bestIndex = 0;
+			for(int x = 0; x < priorities.size(); x++) {
+				if(priorities.get(x) > max)
+				{
+					max = priorities.get(x);
+					bestIndex = x;
+				}
+			}
+	}
+	
+	/**
+	 * Changes a given number to a string time format
+	 * @param num
+	 * @return 6 length string version of the number
+	 */
 	public static String pad0(int num) {
 		int length = String.valueOf(num).length();
 		String padded = "";
@@ -536,6 +656,7 @@ public class src {
 		return padded;
 	}
 	
+	// Fills part of the free boolean array to false given the start and end locations
 	public static void fillTime(int start, int end) {
 		for(int x = start; x < end; x++) {
 			free[x] = false;
@@ -551,6 +672,7 @@ public class src {
 			BufferedReader bReader = new BufferedReader(new FileReader(file));
 			while ((line = bReader.readLine()) != null) {
 				if(line.contains("DTSTART")) {
+					assert(line.length() > 16);
 					String[] parts = line.split(":");
 					String[] timeParts = parts[1].split("T");
 					sDate = timeParts[0];
@@ -578,6 +700,7 @@ public class src {
 				
 				while ((line = bReader.readLine()) != null) {
 					if(line.contains("DTSTART") || line.contains("DTEND")) {
+						assert(line.length() > 16);
 						getTime(line);
 					}
 					else if(line.contains("TZID")) {
@@ -640,8 +763,7 @@ public class src {
 
 	/**
 	 * Reference:
-	 * http://stackoverflow.com/questions/4516572/checking-if-a-date-exists
-	 * -or-not
+	 * http://stackoverflow.com/questions/4516572/checking-if-a-date-exists-or-not
 	 * 
 	 * @author user467871
 	 */
