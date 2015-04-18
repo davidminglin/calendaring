@@ -53,7 +53,7 @@ public class src {
 	static String startYear = null;
 	static String startMonth = null;
 	static String startDay = null;
-	static String endYear;
+	static String endYear = null;
 	static String endMonth = null;
 	static String endDay = null;
 	static boolean isOn = true;
@@ -68,8 +68,8 @@ public class src {
 	static ArrayList<String> times = new ArrayList<String>();
 	static String sDate = null;
 	static boolean[] free = new boolean[240000];
-	static int freeCount;
-	static int meetCount;
+	static int freeCount = 0;
+	static int meetCount = 0;
 	static int bestIndex = 0;
 
         /**
@@ -723,6 +723,7 @@ public class src {
 	 */ 
 	
 	public static void readFiles(String[] files) {
+		times = new ArrayList<String>();
 		// Get information from first file
 		String line;
 		try{
