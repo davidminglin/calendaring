@@ -15,6 +15,19 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.PatternSyntaxException;
 
+/**
+* Class that implements the Calendaring assignment (based on RFC 5545) for ICS 314 (Spring 2015). 
+* Allows someone to: 
+* 1. Create a new .ics calendar file. 
+* 2. Read in a bunch of .ics files to highlight free times for one person.
+* 3. Read in .ics files for two separate people to highlight possible meeting times.
+*
+* @Author David Lin.
+* @Co-Author Anthony Chang.
+* @Co-Author Leon Liu.
+* 
+*/
+
 public class src {
 	static FileWriter writer = null;
 	static File file = null;
@@ -58,6 +71,14 @@ public class src {
 	static int freeCount;
 	static int meetCount;
 	static int bestIndex = 0;
+
+        /**
+         * Main method for Calendaring assignment. Handles user input and creates new .ics files and compares 
+         * sets of .ics files to find free or possible meeting times.
+         * 
+         * @param args Any command-line arguments. 
+         * 
+         */ 
 
 	public static void main(String[] args) throws IOException {
 		do {
@@ -440,7 +461,7 @@ public class src {
 				 * The input is a list of .ics filenames (pathnames, if necessary) 
 				 * that describe events all on the same date and in the same time zone. 
 				 * The output is .ics files describing free times between the inputted events. 
-				 * The Summary field of the output .ics files shall be “Free Time”.
+				 * The Summary field of the output .ics files shall be Â“Free TimeÂ”.
 				 */
 				String[] files;
 				do {
@@ -506,6 +527,17 @@ public class src {
 
 	// to dos
 	
+	/**
+	 * Method to create a .ics file showing free times based on existing .ics files a user feeds into the program.
+	 * Implements Check-in 2. 
+	 * 
+	 * @param None.
+	 * @return None.
+	 * @throws IOException For cases like not being able to open a particular .ics file.
+	 * 
+	 */ 
+	
+	
 	public static void createFree() throws IOException {
 		boolean toggle = true;
 		freeCount = 0;
@@ -540,6 +572,16 @@ public class src {
 			}
 			writer.close();
 	}
+	
+	/**
+	 * Method to find possible meeting times between two sets of .ics files for two people.
+	 * Similar to createFree(). Implements Check-in 3. 
+	 * 
+	 * @param None
+	 * @return None
+	 * @throws IOException For cases like not being able to open a particular .ics file.
+	 * 
+	 */
 	
 	public static void createMeet() throws IOException {
 		boolean toggle = true;
@@ -577,6 +619,15 @@ public class src {
 			}
 			writer.close();
 	}
+	
+	/**
+	 * Method to determine the best meeting time out of possible meeting times between two people.
+	 * Implements Check-in 3. 
+	 * 
+	 * @param String[] files A string array holding paths for a bunch of .ics files to examine
+	 * @return None
+	 * 
+	 */ 
 	
 	public static void findBestMeet(String[] files) {
 		boolean toggle = true;
@@ -663,6 +714,14 @@ public class src {
 		}
 	}
 	
+	/**
+	 * Method to read a bunch of .ics files and collect pertinent information from them.
+	 * 
+	 * @param String[] files String array holding paths for a bunch of .ics files to read from.
+	 * @return None
+	 * 
+	 */ 
+	
 	public static void readFiles(String[] files) {
 		// Get information from first file
 		String line;
@@ -716,7 +775,14 @@ public class src {
 		
 	}
 	
-	// Checks if input are valid files
+	/** 
+	 * Method that checks if input .ics files are valid files.
+	 * 
+	 * @param String[] A string array containing paths for a bunch of .ics files to examine.
+	 * @return boolean True if bad file path found, false otherwise.
+	 * 
+	 */
+	 
 	public static boolean badFiles(String[] files) {
 		for(int x = 0; x < files.length; x++) {
 			filepath = files[x];
@@ -729,7 +795,14 @@ public class src {
 		return false;
 	}
 	
-	// Gets the time from the dtstart/dtend and adds to the ArrayList times
+	/**
+	 * Method that gets the time from the dtstart/dtend and adds to the ArrayList times.
+	 * 
+	 * @param String line The dtstart/dtend string to obtain time from.
+	 * @return None
+	 * 
+	 */
+	 
 	public static void getTime(String line) {
 		String[] parts = line.split(":");
 		String[] timeParts = parts[1].split("T");
@@ -739,7 +812,14 @@ public class src {
 		times.add(time);
 	}
 	
-	// Returns first char from keyboard
+	/** 
+	 * Method that returns first char from keyboard buffer. 
+	 * 
+	 * @param None
+	 * @return char options.charAt(0) The character at position 0 of the keyboard buffer.
+	 * 
+	 */
+	 
 	public static char getChar() {
 		empty = true;
 		do {
@@ -750,7 +830,14 @@ public class src {
 		return (options.charAt(0));
 	}
 
-	// Returns line from keyboard
+	/**
+	 * Method that returns the next line from keyboard buffer.
+	 * 
+	 * @param None
+	 * @return String options The next line in the keyboard buffer.
+	 * 
+	 */
+	 
 	public static String getLine() {
 		empty = true;
 		do {
@@ -762,10 +849,16 @@ public class src {
 	}
 
 	/**
+	 * Method that checks if a given date exists. 
+	 * 
 	 * Reference:
 	 * http://stackoverflow.com/questions/4516572/checking-if-a-date-exists-or-not
 	 * 
-	 * @author user467871
+	 * @author user467871.
+	 * 
+	 * @param String date The date to check for.
+	 * @return boolean true if given date exists, false otherwise. 
+	 * 
 	 */
 	public static boolean dateExists(String date) {
 		String formatString = "MM/dd/yyyy";
@@ -783,6 +876,15 @@ public class src {
 		return true;
 	}
 
+
+        /**
+         * Method that checks if a given time exists. Similar to dateExists(String date).
+         * 
+         * @param String time The time to check for. 
+         * @return boolean true if given time exists, false otherwise.
+         * 
+         */
+         
 	public static boolean timeExists(String time) {
 		String formatString = "HHmmss";
 
